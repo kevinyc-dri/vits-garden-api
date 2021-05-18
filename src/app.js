@@ -39,11 +39,32 @@ app.get('/', (req, res) => {
 })
 
 app.post('/signup', (req, res) => {
-  const { email, password } = req.body
+  const { email, password, firstName, lastName } = req.body
 
-  const user = new User({ email, password })
+  const user = new User({ email, password, firstName, lastName })
 
-  user.save().then(() => {
-    console.log('user was saved')
+  user
+    .save()
+    .then(() => {
+      res.status(200).send('user was added')
+      console.log('user was saved in db')
   }).catch(err => console.log(err))
+})
+
+app.post('/signin', (req, res) => {
+  const { email, password } = req.body
+  
+  User
+    .findOne({ email: email })
+    .then(userExists => {
+      // check if email exists in db
+      if(!userExists){
+        return res.status(400).send({error: 'User not found'})
+      } 
+      // check if email and password is in object
+      if(!email || !password)
+      return res.status(422).send({error: 'Must Provide email and password'})
+    })
+    .catch(err => console.log(err))
+
 })
