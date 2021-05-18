@@ -1,7 +1,18 @@
+require('./models/UserModel')
 const express = require('express')
 const mongoose = require('mongoose')
+const app = express() 
+const bodyParser = require('body-parser')
+
+const authRoutes = require('./routes/authRoutes')
+
+const User = mongoose.model('User')
+
+app.use(bodyParser.json())
+// app.use(authRoutes)
 
 const mongoUri = 'mongodb+srv://admin:Wx6QDK9GxIb5WMxX@cluster0.xgnqc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+
 mongoose.connect(mongoUri, {} )
 
 mongoose.connect(mongoUri, {
@@ -18,7 +29,6 @@ mongoose.connection.on('error', (err) => {
   console.log('Error connection to mongo', err)
 })
 
-const app = express() 
 
 app.listen('5000', () => {
   console.log('App is listening on port 5000')
@@ -26,4 +36,14 @@ app.listen('5000', () => {
 
 app.get('/', (req, res) => {
   res.send('Welcome to Vits Garden')
+})
+
+app.post('/signup', (req, res) => {
+  const { email, password } = req.body
+
+  const user = new User({ email, password })
+
+  user.save().then(() => {
+    console.log('user was saved')
+  }).catch(err => console.log(err))
 })
